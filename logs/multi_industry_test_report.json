@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-10-06T12:39:11.905227",
+  "total_industries_tested": 3,
+  "results": [
+    {
+      "industry_key": "FINANCE_ASSET_MANAGEMENT",
+      "industry_display": "Mercado Financeiro / Asset Management & Banking",
+      "pdf_filename": "curriculo_rodrigo_bueno_finance_ats.pdf",
+      "pdf_path": "D:\\linkpro\\linkpro\\generated_resumes\\curriculo_rodrigo_bueno_finance_ats.pdf",
+      "pages_count": 2,
+      "total_chars": 2469,
+      "ats_score": 100,
+      "all_sections_present": true,
+      "metrics_bars_detected": true,
+      "status": "APPROVED"
+    },
+    {
+      "industry_key": "FOOD_BAKERY_GASTRONOMY",
+      "industry_display": "Alimentos & Gastronomia / Panificação & Confeitaria Industrial",
+      "pdf_filename": "curriculo_matheus_ramos_panificacao_ats.pdf",
+      "pdf_path": "D:\\linkpro\\linkpro\\generated_resumes\\curriculo_matheus_ramos_panificacao_ats.pdf",
+      "pages_count": 1,
+      "total_chars": 2559,
+      "ats_score": 100,
+      "all_sections_present": true,
+      "metrics_bars_detected": true,
+      "status": "APPROVED"
+    },
+    {
+      "industry_key": "CIVIL_ENGINEERING_CONSTRUCTION",
+      "industry_display": "Engenharia Civil / Gerenciamento de Obras & Infraestrutura",
+      "pdf_filename": "curriculo_beatriz_duarte_engenharia_ats.pdf",
+      "pdf_path": "D:\\linkpro\\linkpro\\generated_resumes\\curriculo_beatriz_duarte_engenharia_ats.pdf",
+      "pages_count": 2,
+      "total_chars": 2558,
+      "ats_score": 100,
+      "all_sections_present": true,
+      "metrics_bars_detected": true,
+      "status": "APPROVED"
+    }
+  ],
+  "overall_status": "ALL_APPROVED"
+}

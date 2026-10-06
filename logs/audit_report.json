@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-10-06T11:08:43.110272",
+  "candidate": "Carlos Eduardo Mendes",
+  "target_job": "Senior Java Software Engineer (Reactive Systems)",
+  "ats_pdf_audit": {
+    "pdf_path": "D:\\linkpro\\linkpro\\generated_resumes\\curriculo_carlos_mendes_ats.pdf",
+    "score": 100,
+    "num_pages": 1,
+    "word_count": 159,
+    "has_readable_text": true,
+    "contact_detected": {
+      "email": "carlos.mendes@dev.com",
+      "phone": "+55 (11) 97123-4567",
+      "valid": true
+    },
+    "sections": {
+      "detected": [
+        "RESUMO PROFISSIONAL",
+        "HABILIDADES E COMPETENCIAS",
+        "EXPERIENCIA PROFISSIONAL"
+      ],
+      "missing": []
+    },
+    "status": "APPROVED",
+    "extracted_snippet": "\n--- Pagina 1 ---\nCarlos Eduardo Mendes\nEmail: carlos.mendes@dev.com | Tel: +55 (11) 97123-4567 | Local: Sao Paulo, SP - Remoto\nRESUMO PROFISSIONAL\nEngenheiro de Software Backend especializado em Java 21, Spring Boot e sistemas reativos com Project\nReactor. Experiencia na concepcao de microsservicos..."
+  },
+  "nvidia_ai_match_audit": {
+    "mode": "NVIDIA_NEMOTRON_REAL",
+    "latency_ms": 171034.55,
+    "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "reasoning_summary": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Role:** Senior Recruitment Auditor & ATS Expert, using \"Resume Tailoring Skill\" methodology.\n   - **Target Job:** Senior Java Software Engineer (Reactive Systems)\n     - Requirements: Java 21, Spring Boot, reactive programming (Project Reactor/WebFlux), Kafka, Docker, PostgreSQL (mandatory). Bonus: automation testing, microservices in ...",
+    "output": {
+      "overall_score": 96.0,
+      "confidence_band": "DIRECT",
+      "pillar_scores": {
+        "direct_match": 100,
+        "transferable_skills": 100,
+        "adjacent_experience": 85,
+        "impact_alignment": 90
+      },
+      "justification": "Candidate possesses all mandatory technical stacks (Java 21, Spring Boot 3, Project Reactor, Kafka, Docker, PostgreSQL) with explicit experience in distributed microservices, CI/CD pipelines, and clean architecture. Reactive systems focus aligns with job objectives. Bonus skills (Playwright test automation, Python scripting) add tangential value without inflating core match.",
+      "matched_keywords": [
+        "Java 21",
+        "Spring Boot",
+        "Project Reactor",
+        "Kafka",
+        "Docker",
+        "PostgreSQL"
+      ],
+      "missing_keywords": [],
+      "reframing_suggestions": [
+        "Frame Playwright proficiency as automated testing for reactive endpoints",
+        "Emphasize Clean Architecture contributions to microservices resilience and performance",
+        "Position CI/CD cloud experience as support for reactive system deployment pipelines"
+      ],
+      "branching_questions": [],
+      "recommendation": "APROVADO_PARA_CANDIDATURA"
+    },
+    "status": "SUCCESS"
+  },
+  "nvidia_tailoring_audit": {
+    "status": "APPROVED",
+    "latency_ms": 63369.86,
+    "tailored_pdf_path": "D:\\linkpro\\linkpro\\generated_resumes\\curriculo_carlos_mendes_tailored_ats.pdf",
+    "tailored_summary": "Engenheiro de Software Backend sênior com expertise profunda em Java 21, Spring Boot 3 e programação reativa via Project Reactor. Experiência sólida na concepção de microsserviços distribuídos, integração com Kafka, e pipelines CI/CD utilizando Docker e PostgreSQL, garantindo alta performance e resiliência. Focado em Clean Architecture e automação de testes para entrega contínua de sistemas de missão crítica em nuvem.",
+    "reframing_notes": "Alinhou termos como 'Java 21', 'Spring Boot 3' e 'Project Reactor' diretamente com os requisitos da vaga. Recontextualizou 'Clean Architecture' e 'automação de testes' como pilares de resiliência e CI/CD, correspondendo ao diferencial solicitado. Destacou experiência real com 'Kafka', 'Docker' e 'PostgreSQL', que são requisitos indispensáveis. Todas as informações permanecem verdadeiras e baseadas no perfil do candidato, sem inventar novas habilidades.",
+    "cover_letter": "Prezado(a) Selecionador(a),\n\nEscrevo para expressar meu forte interesse na vaga de Senior Java Software Engineer (Reactive Systems), alinhada com a missão da sua equipe de desenvolver sistemas escaláveis e de alta performance. Minha trajetória em Java 21, Spring Boot 3 e programação reativa com Project Reactor, combinada com experiência prática na arquitetura de microsserviços usando Kafka, Docker e PostgreSQL, corresponde diretamente aos requisitos técnicos da posição. Tenho liderado pipelines CI/CD e aplicado Clean Architecture para garantir resiliência e performance em sistemas de produção em nuvem.\n\nEstou ansioso para contribuir com minha expertise em sistemas reativos e microsserviços nativos da nuvem para o seu time. Disponível para uma entrevista onde posso detalhar como minha experiência se alinha aos objetivos da empresa. Obrigado pela consideração.\n\nAtenciosamente,\nCarlos Eduardo Mendes",
+    "reasoning_summary": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Role:** Senior Resume & Executive Cover Letter Writer\n   - **Methodology:** 'Truth-Preserving Optimization' (align terminology, highlight relevant impacts without inventing info)\n   - **Job Vacancy:** Senior Java Software Engineer (React..."
+  },
+  "log_file": "D:\\linkpro\\linkpro\\logs\\ats_audit.log",
+  "overall_status": "PASSED"
+}

@@ -1,0 +1,70 @@
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] ================================================================
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] === INICIANDO BATERIA DE TESTES E AUDITORIA ATS / MODELOS IA ===
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] ================================================================
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Iniciando auditoria de extracao do PDF: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_ats.pdf
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Extracao concluida em 166.71ms | Paginas: 1 | Caracteres: 1103 | Palavras: 159
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Score ATS do PDF: 100/100 - Status: APPROVED
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Iniciando auditoria de Match Score para vaga: 'Senior Java Software Engineer (Reactive Systems)'
+2026-10-06 10:29:27 [DEBUG] [ATS-AUDIT] [PROMPT ENVIADO]:
+Você é um avaliador técnico ATS especializado.
+Vaga: Senior Java Software Engineer (Reactive Systems)
+Descrição da vaga: Procuramos Desenvolvedor Java Senior com experiência comprovada em Java 21, Spring Boot e programação reativa (Project Reactor / WebFlux). Conhecimento em Kafka, Docker e bancos relacionais como PostgreSQL é indispensável. Diferencial: Experiência com automação de testes e microsserviços em nuvem.
+Perfil do Candidato:
+- Habilidades: Java 21, Project Reactor, Spring Boot 3, Docker, PostgreSQL, Kafka, Playwright, Python, Git, REST APIs, Clean Architecture
+- Resumo: Engenheiro de Software Backend especializado em Java 21, Spring Boot e sistemas reativos com Project Reactor. Experiência na concepção de microsserviços distribuídos, filas Kafka, e esteiras de CI/CD em nuvem. Focado em padrões limpos, resiliência e alta performance.
+
+Avalie a aderência de 0 a 100. Responda em JSON estrito: {"match_score": <number>, "justification": "<text>", "matched_keywords": ["<str>"], "missing_keywords": ["<str>"]}
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Executando Auditoria Heuristica / Fallback de Match Scoring...
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] [AUDIT LOG] Heuristica de Match: Score=53.6% | Matched=5 | Missing=1
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Auditoria de Tailoring do curriculo para: Senior Java Software Engineer (Reactive Systems)
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Auditoria de Tailoring concluida em 0.00ms | Grounding: VALIDO
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] Relatorio de auditoria salvo em: D:\linkpro\linkpro\logs\audit_report.json
+2026-10-06 10:29:27 [INFO] [ATS-AUDIT] === AUDITORIA CONCLUIDA COM SUCESSO ===
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] === AUDITORIA ATS & NVIDIA NEMOTRON 3.5 LIGHTNING (JOB AUTOMATOR AI) ===
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] Iniciando auditoria de extracao do PDF: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_ats.pdf
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] Extracao do PDF concluida em 50.47ms | Paginas: 1 | Caracteres: 1103 | Palavras: 159
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] Score ATS do PDF: 100/100 - Status: APPROVED
+2026-10-06 10:43:59 [INFO] [ATS-AUDIT] Iniciando auditoria de Match Score com NVIDIA Nemotron para a vaga: 'Senior Java Software Engineer (Reactive Systems)'
+2026-10-06 10:45:11 [INFO] [ATS-AUDIT] [NVIDIA REASONING]: Here's a thinking process:
+
+1.  **Analyze User Input:**
+   - Role: Senior auditor/evaluator of ATS (Applicant Tracking System)
+   - Task: Evaluate candidate adherence to job description on a scale 0-1...
+2026-10-06 10:45:11 [INFO] [ATS-AUDIT] Auditoria NVIDIA concluida com sucesso em 72213.09ms: Score=95
+2026-10-06 10:45:11 [INFO] [ATS-AUDIT] Iniciando auditoria de Tailoring e Cover Letter com NVIDIA Nemotron...
+2026-10-06 10:46:03 [INFO] [ATS-AUDIT] Cover Letter gerada com sucesso pela NVIDIA em 51866.01ms (Tamanho: 1350 chars)
+2026-10-06 10:46:03 [INFO] [ATS-AUDIT] Relatório de auditoria salvo em: D:\linkpro\linkpro\logs\audit_report.json
+2026-10-06 10:46:03 [INFO] [ATS-AUDIT] === AUDITORIA COMPLETA CONCLUÍDA ===
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] === AUDITORIA ATS & NVIDIA NEMOTRON 3.5 LIGHTNING (JOB AUTOMATOR AI) ===
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] Iniciando auditoria de extracao do PDF: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_ats.pdf
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] Extracao do PDF concluida em 22.20ms | Paginas: 1 | Caracteres: 1103 | Palavras: 159
+2026-10-06 10:57:41 [INFO] [ATS-AUDIT] Score ATS do PDF: 100/100 - Status: APPROVED
+2026-10-06 10:57:42 [INFO] [ATS-AUDIT] Iniciando auditoria de Match Score com NVIDIA Nemotron para a vaga: 'Senior Java Software Engineer (Reactive Systems)'
+2026-10-06 11:01:06 [WARNING] [ATS-AUDIT] Chamada NVIDIA falhou (Expecting value: line 1 column 1 (char 0)). Recorrendo a fallback...
+2026-10-06 11:01:06 [INFO] [ATS-AUDIT] Iniciando auditoria de Tailoring e Reframing com NVIDIA Nemotron...
+2026-10-06 11:02:03 [INFO] [ATS-AUDIT] Tailoring e Cover Letter gerados com sucesso pela NVIDIA em 57672.61ms
+2026-10-06 11:02:03 [INFO] [ATS-AUDIT] Curriculo adaptado gerado em: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_tailored_ats.pdf
+2026-10-06 11:02:03 [INFO] [ATS-AUDIT] Relatório de auditoria salvo em: D:\linkpro\linkpro\logs\audit_report.json
+2026-10-06 11:02:03 [INFO] [ATS-AUDIT] === AUDITORIA COMPLETA CONCLUÍDA ===
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] === AUDITORIA ATS & NVIDIA NEMOTRON 3.5 LIGHTNING (JOB AUTOMATOR AI) ===
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] ==========================================================================
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] Iniciando auditoria de extracao do PDF: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_ats.pdf
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] Extracao do PDF concluida em 33.63ms | Paginas: 1 | Caracteres: 1103 | Palavras: 159
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] Score ATS do PDF: 100/100 - Status: APPROVED
+2026-10-06 11:04:48 [INFO] [ATS-AUDIT] Iniciando auditoria de Match Score com NVIDIA Nemotron para a vaga: 'Senior Java Software Engineer (Reactive Systems)'
+2026-10-06 11:07:39 [INFO] [ATS-AUDIT] [NVIDIA REASONING]: Here's a thinking process:
+
+1.  **Analyze User Input:**
+   - **Role:** Senior Recruitment Auditor & ATS Expert, using "Resume Tailoring Skill" methodology.
+   - **Target Job:** Senior Java Software En...
+2026-10-06 11:07:39 [INFO] [ATS-AUDIT] Auditoria NVIDIA concluida com sucesso em 171034.55ms: Score=None
+2026-10-06 11:07:39 [INFO] [ATS-AUDIT] Iniciando auditoria de Tailoring e Reframing com NVIDIA Nemotron...
+2026-10-06 11:08:43 [INFO] [ATS-AUDIT] Tailoring e Cover Letter gerados com sucesso pela NVIDIA em 63369.86ms
+2026-10-06 11:08:43 [INFO] [ATS-AUDIT] Curriculo adaptado gerado em: D:\linkpro\linkpro\generated_resumes\curriculo_carlos_mendes_tailored_ats.pdf
+2026-10-06 11:08:43 [INFO] [ATS-AUDIT] Relatório de auditoria salvo em: D:\linkpro\linkpro\logs\audit_report.json
+2026-10-06 11:08:43 [INFO] [ATS-AUDIT] === AUDITORIA COMPLETA CONCLUÍDA ===

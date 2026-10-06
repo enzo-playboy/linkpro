@@ -61,9 +61,15 @@ class ResumePDFGenerator:
         name = self._sanitize(resume_data.get("full_name", "Candidato"))
         pdf.cell(w, 10, name, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="L")
 
-        pdf.set_font("Helvetica", "", 10)
+        pdf.set_font("Helvetica", "", 9.5)
         pdf.set_text_color(100, 100, 100)
-        contact_info = f"Email: {resume_data.get('email', '')} | Tel: {resume_data.get('phone', '')} | Local: {resume_data.get('location', '')}"
+        contacts = []
+        if resume_data.get("email"): contacts.append(f"Email: {resume_data.get('email')}")
+        if resume_data.get("phone"): contacts.append(f"Tel: {resume_data.get('phone')}")
+        if resume_data.get("location"): contacts.append(f"Local: {resume_data.get('location')}")
+        if resume_data.get("linkedin"): contacts.append(f"LinkedIn: {resume_data.get('linkedin')}")
+        if resume_data.get("portfolio"): contacts.append(f"Portfolio: {resume_data.get('portfolio')}")
+        contact_info = " | ".join(contacts)
         pdf.cell(w, 6, self._sanitize(contact_info), new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="L")
         pdf.ln(3)
 
@@ -80,15 +86,26 @@ class ResumePDFGenerator:
             pdf.multi_cell(w, 5, self._sanitize(resume_data["summary"]), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
             pdf.ln(4)
 
-        # 3. Section: Skills / Competências
+        # 3. Section: Skills / Competências (Suporta lista simples ou dicionário categorizado)
         if "skills" in resume_data and resume_data["skills"]:
             self._add_section_title(pdf, "HABILIDADES E COMPETENCIAS")
-            pdf.set_font("Helvetica", "", 10)
-            pdf.set_text_color(40, 40, 40)
-            skills_list = resume_data["skills"]
-            skills_str = ", ".join(skills_list) if isinstance(skills_list, list) else str(skills_list)
-            pdf.multi_cell(w, 5, self._sanitize(skills_str), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-            pdf.ln(4)
+            skills_data = resume_data["skills"]
+            if isinstance(skills_data, dict):
+                for category, items in skills_data.items():
+                    pdf.set_font("Helvetica", "B", 9.5)
+                    pdf.set_text_color(0, 51, 102)
+                    pdf.cell(w, 4.5, self._sanitize(f"{category.upper()}:"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.set_font("Helvetica", "", 9.5)
+                    pdf.set_text_color(40, 40, 40)
+                    items_str = ", ".join(items) if isinstance(items, list) else str(items)
+                    pdf.multi_cell(w, 4.5, self._sanitize(items_str), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf.ln(1.5)
+            else:
+                pdf.set_font("Helvetica", "", 10)
+                pdf.set_text_color(40, 40, 40)
+                skills_str = ", ".join(skills_data) if isinstance(skills_data, list) else str(skills_data)
+                pdf.multi_cell(w, 5, self._sanitize(skills_str), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(3)
 
         # 4. Section: Experience
         if "experiences" in resume_data and resume_data["experiences"]:
@@ -110,6 +127,56 @@ class ResumePDFGenerator:
                     for item in exp["highlights"]:
                         pdf.multi_cell(w, 5, self._sanitize(f"- {item}"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                 pdf.ln(3)
+
+        # 5. Section: Education / Formação Acadêmica
+        if "education" in resume_data and resume_data["education"]:
+            self._add_section_title(pdf, "FORMACAO ACADEMICA")
+            for edu in resume_data["education"]:
+                pdf.set_font("Helvetica", "B", 10)
+                pdf.set_text_color(0, 51, 102)
+                course = f"{edu.get('degree', '')} - {edu.get('institution', '')}"
+                pdf.cell(w, 5, self._sanitize(course), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+
+                pdf.set_font("Helvetica", "I", 9)
+                pdf.set_text_color(120, 120, 120)
+                year_info = f"Periodo: {edu.get('period', '')}"
+                if "details" in edu:
+                    year_info += f" | {edu.get('details')}"
+                pdf.cell(w, 5, self._sanitize(year_info), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                pdf.ln(2)
+            pdf.ln(2)
+
+        # 6. Section: Certifications & Titles / Certificações e Títulos
+        if "certifications" in resume_data and resume_data["certifications"]:
+            self._add_section_title(pdf, "CERTIFICACOES E TITULOS")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.set_text_color(40, 40, 40)
+            for cert in resume_data["certifications"]:
+                pdf.multi_cell(w, 5, self._sanitize(f"- {cert}"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(3)
+
+        # 7. Section: Publications & Research / Publicações e Pesquisas
+        if "publications" in resume_data and resume_data["publications"]:
+            self._add_section_title(pdf, "PUBLICACOES E PESQUISAS")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.set_text_color(40, 40, 40)
+            for pub in resume_data["publications"]:
+                pdf.multi_cell(w, 5, self._sanitize(f"- {pub}"), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(3)
+
+        # 8. Section: Languages / Idiomas
+        if "languages" in resume_data and resume_data["languages"]:
+            self._add_section_title(pdf, "IDIOMAS")
+            pdf.set_font("Helvetica", "", 10)
+            pdf.set_text_color(40, 40, 40)
+            lang_items = []
+            for lang in resume_data["languages"]:
+                if isinstance(lang, dict):
+                    lang_items.append(f"{lang.get('language', '')} ({lang.get('proficiency', '')})")
+                else:
+                    lang_items.append(str(lang))
+            pdf.multi_cell(w, 5, self._sanitize(" | ".join(lang_items)), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(3)
 
         # Output path
         output_path = os.path.join(self.output_dir, filename)
