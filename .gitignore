@@ -16,6 +16,8 @@ target/
 # Generated output files
 screenshots/
 generated_resumes/
+sessions/
+*.json.state
 
 # Reference repositories (study only)
 ecc-reference/

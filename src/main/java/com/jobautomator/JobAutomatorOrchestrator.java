@@ -191,8 +191,14 @@ public class JobAutomatorOrchestrator {
     protected Mono<Map<String, Object>> triggerBrowserGymAutoApply(Map<String, Object> jobData) {
         log.info("Triggering BrowserGym auto-apply sub-agent safely for job: {}", jobData.get("title"));
 
+        String applyUrl = (String) jobData.getOrDefault("applyUrl", "https://www.linkedin.com/jobs");
+        List<String> scriptArgs = List.of(
+                "--apply",
+                "--job-url=" + applyUrl
+        );
+
         return rateLimiter.acquire(ServiceName.BROWSERGYM_APPLY)
-                .then(processExecutor.executePythonScript("src/browsergym_service.py", List.of()))
+                .then(processExecutor.executePythonScript("src/browsergym_service.py", scriptArgs))
                 .map(result -> {
                     Map<String, Object> updated = new HashMap<>(jobData);
                     updated.put("applicationStatus", result.isSuccess() ? "SUBMITTED" : "REQUIRES_MANUAL");

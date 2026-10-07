@@ -1,0 +1,54 @@
+{
+  "personal_info": {
+    "full_name": "Enzo Henrique",
+    "email": "geminiflowra@gmail.com",
+    "phone": "65 992340678",
+    "city": "Cuiabá, Mato Grosso, Brasil",
+    "linkedin_url": "https://www.linkedin.com/in/enzo-henrique",
+    "github_url": "https://github.com/enzo-henrique"
+  },
+  "work_authorization": {
+    "authorized_to_work": true,
+    "requires_visa_sponsorship": false,
+    "legally_authorized": true,
+    "commute_or_relocate": true,
+    "hybrid_or_remote": true,
+    "presencial": true,
+    "work_onsite": true
+  },
+  "experience": {
+    "total_years": 5,
+    "skills_years": {
+      "java": 5,
+      "python": 4,
+      "spring boot": 4,
+      "sql": 5,
+      "docker": 3,
+      "aws": 3,
+      "react": 3,
+      "javascript": 4,
+      "typescript": 3,
+      "frontend": 4,
+      "html": 4,
+      "css": 4,
+      "git": 5
+    }
+  },
+  "languages": {
+    "english": "Fluent",
+    "portuguese": "Native"
+  },
+  "education": {
+    "highest_degree": "Bachelor's Degree",
+    "course": "Computer Science / Engenharia de Software"
+  },
+  "compensation": {
+    "desired_salary": "12000",
+    "currency": "BRL"
+  },
+  "screening_defaults": {
+    "notice_period_weeks": "2",
+    "notice_period_days": "15",
+    "years_management": "0"
+  }
+}

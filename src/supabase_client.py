@@ -99,10 +99,67 @@ class SupabaseService:
             logger.error("Error logging application: %s", str(e))
         return None
 
+    def save_browser_session(self, user_id: Optional[str], session_data: str, user_agent: str = "Playwright-Chromium", status: str = "active") -> Optional[Dict[str, Any]]:
+        if not self.is_connected:
+            logger.info("[MOCK] Save Browser Session for user: %s (status: %s)", user_id, status)
+            return {"id": "mock-session-uuid", "user_id": user_id, "status": status}
+        try:
+            payload = {
+                "user_id": user_id,
+                "cookies_encrypted": session_data,
+                "user_agent": user_agent,
+                "status": status
+            }
+            res = self.client.table("browser_sessions").insert(payload).execute()
+            if res.data:
+                logger.info("Browser session synced to Supabase: %s", res.data[0]['id'])
+                return res.data[0]
+        except Exception as e:
+            logger.error("Error saving browser session to Supabase: %s", str(e))
+        return None
+
+    def sync_applicant_profile(self, profile_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        personal = profile_data.get("personal_info", {})
+        email = personal.get("email", "candidato@exemplo.com")
+        full_name = personal.get("full_name", "Candidato Automação")
+        return self.insert_user(email=email, full_name=full_name, preferences=profile_data)
+
 if __name__ == "__main__":
+    import json
     service = SupabaseService()
+    print("\n--- Teste de Conexão Supabase ---")
     if service.check_connection():
-        print("[OK] Supabase esta conectado e funcionando com sucesso!")
+        print("[OK] Supabase conectado com sucesso na nuvem!")
+        
+        # 1. Sincronizar Perfil
+        profile_file = os.path.join(os.getcwd(), "data", "applicant_profile.json")
+        user_id = None
+        if os.path.exists(profile_file):
+            try:
+                with open(profile_file, "r", encoding="utf-8") as f:
+                    pdata = json.load(f)
+                res_u = service.sync_applicant_profile(pdata)
+                if res_u:
+                    user_id = res_u.get("id")
+                    print(f"[OK] Perfil do candidato sincronizado na tabela 'users'! (ID: {user_id})")
+            except Exception as e:
+                print(f"[AVISO] Falha ao sincronizar perfil: {e}")
+
+        # 2. Sincronizar Sessão Local do LinkedIn
+        session_file = os.path.join(os.getcwd(), "sessions", "linkedin_state.json")
+        if os.path.exists(session_file):
+            try:
+                with open(session_file, "r", encoding="utf-8") as f:
+                    raw_session = f.read()
+                res_s = service.save_browser_session(user_id=user_id, session_data=raw_session, user_agent="Playwright-Chromium")
+                if res_s:
+                    print(f"[OK] Sessão do LinkedIn sincronizada na tabela 'browser_sessions'! (ID: {res_s.get('id')})")
+            except Exception as e:
+                print(f"[AVISO] Falha ao sincronizar sessão: {e}")
+        else:
+            print("[INFO] Nenhuma sessão local 'sessions/linkedin_state.json' encontrada para sincronizar.")
+
     else:
-        print("[WARNING] Supabase nao esta conectado. Forneca a SUPABASE_URL e a SUPABASE_KEY no arquivo .env.")
+        print("[WARNING] Não foi possível consultar a tabela 'users'.")
+        print("DICA: Se você acabou de criar o projeto no Supabase, lembre-se de executar o script SQL contido em 'specs/schema.sql' no SQL Editor do painel do Supabase para criar as tabelas!")
 
