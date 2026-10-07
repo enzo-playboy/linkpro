@@ -1,4 +1,4 @@
-# PRD - Automação Inteligente de Vagas, Notificações e Marketing LinkedIn (JobAutomator AI)
+# PRD - Automação Inteligente de Vagas e Notificações (JobAutomator AI)
 
 > **Versão**: 1.1.0  
 > **Status**: Especificação Atualizada com Áudio do Usuário (Spec-Driven Development)  
@@ -11,7 +11,6 @@
 O **JobAutomator AI** é uma plataforma baseada em **Multi-Agentes Reativos** projetada para automatizar o ciclo completo de:
 1. Busca, filtragem e candidatura automatizada a vagas no LinkedIn.
 2. Monitoramento de respostas por e-mail (Gmail) com **notificação instantânea via Telegram / WhatsApp** (para o candidato não precisar ficar checando e-mails).
-3. Geração e agendamento de **posts no LinkedIn** para fortalecer o marketing pessoal e atrair recrutadores organicamente.
 
 ---
 
@@ -23,10 +22,9 @@ graph TD
     A --> C[Resume & Cover Letter Tailor Agent]
     A --> D[Auto-Apply Sub-Agent - BrowserGym]
     A --> E[Gmail Monitor & Email Classifier Agent]
-    A --> F[LinkedIn Marketing & Post Generator Agent]
+    A --> J[LinkedIn Profile Scanner Agent]
     
     E -->|Notificação Urgente| G[Telegram / WhatsApp Bot]
-    F -->|Publicação de Posts| H[Perfil do LinkedIn]
     B -->|Salva Vagas| I[(Supabase Database)]
     C -->|Gera Currículo ATS PDF| I
     D -->|Realiza Candidatura| H
@@ -46,12 +44,13 @@ graph TD
   - Resumo do E-mail
   - Próximo passo exigido (ex: link do agendamento ou teste)
 
-#### 🚀 2. LinkedIn Personal Marketing & Post Generator Agent
-- **Função**: Gera posts estratégicos para o perfil do LinkedIn do candidato para aumentar o alcance orgânico (*personal branding*).
+#### 🕵️‍♂️ 2. LinkedIn Profile Scanner Agent
+- **Função**: Escaneia o perfil do LinkedIn do candidato e aponta onde estão os erros, seções ausentes e o que precisa ser melhorado.
 - **Recursos**:
-  - Geração de artigos e posts curtos sobre aprendizados, projetos desenvolvidos, desafios superados e tendências de tecnologia (Java, IA, Python, Cloud).
-  - Sugestão de hashtags e call-to-action (CTA).
-  - Agendamento de postagens via API do LinkedIn.
+  - Avaliação de Headline (título).
+  - Análise do "Sobre" e experiência.
+  - Otimização para palavras-chave (SEO no LinkedIn).
+  - Verificação se o estado do perfil impacta o engajamento na plataforma ao criar e usar a conta.
 
 ---
 
@@ -70,14 +69,6 @@ graph TD
 - `sent_to_whatsapp` (boolean)
 - `created_at` (timestamp)
 
-#### `linkedin_posts`
-- `id` (uuid, primary key)
-- `user_id` (foreign key -> users.id)
-- `topic` (string) — "Java 21", "Multi-Agent Systems", "Project Reactor"
-- `post_content` (text)
-- `status` (string) — "draft", "scheduled", "published"
-- `scheduled_for` (timestamp, nullable)
-
 ---
 
 ## 4. Requisitos Funcionais Atualizados
@@ -89,5 +80,23 @@ graph TD
 ### RF-07: Notificação em Tempo Real no Telegram / WhatsApp
 - Enviar notificação via Bot do Telegram / WhatsApp assim que uma resposta positiva ou agendamento for detectado.
 
-### RF-08: Gerador de Conteúdo para LinkedIn
-- Permitir gerar posts semanais sobre o progresso de estudos e projetos no GitHub para atrair recrutadores.
+### RF-08: Test-Driven Development (TDD) & Bateria de Testes Reativa
+- Cobertura completa de testes unitários e de integração reativos (JUnit 5, Mockito, Project Reactor `StepVerifier`, Python unittest).
+- Verificação de ausência de bloqueios em threads e validação de fallbacks resilientes.
+
+### RF-09: Security Review & Sanitização de ProcessBuilder
+- Sanitização estrita de scripts Python executados via sub-processo (`ProcessSanitizer`).
+- Prevenção de Path Traversal (`..`), rejeição de metacaracteres de injeção de comando (`;&|`$><`).
+- Whitelist de scripts permitidos e higienização de variáveis de ambiente.
+- Execução não-bloqueante (`SecureProcessExecutor`) com limite de timeout e encerramento forçado em caso de travamento.
+
+### RF-10: Exception Handling Centralizado & Mascaramento de Credenciais
+- Hierarquia centralizada de exceções (`JobAutomatorException`, `SecurityValidationException`, `RateLimitExceededException`).
+- Redação automática de segredos (`sk-***`, tokens JWT, senhas) em logs e respostas formatadas (`CentralizedErrorHandler`).
+- Fallbacks não-bloqueantes (`onErrorResume`) sem interrupção do pipeline.
+
+### RF-11: Rate Limiting Reativo com Token Bucket
+- Controle de vazão e cadência de chamadas (`ReactiveRateLimiter`) via algoritmo Token Bucket não-bloqueante.
+- Limites individualizados por serviço: LinkedIn Scraping, BrowserGym Auto-Apply, OpenAI API e Gmail Monitor.
+
+

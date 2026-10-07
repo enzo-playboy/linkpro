@@ -27,7 +27,7 @@ NVIDIA_MODEL = os.getenv("NVIDIA_MODEL", "nvidia/nemotron-3.5-lightning-30b-a3b"
 
 class NvidiaAIService:
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None, model: Optional[str] = None):
-        self.api_key = api_key or NVIDIA_API_KEY
+        self.api_key = api_key or NVIDIA_API_KEY or os.getenv("OPENAI_API_KEY", "") or "dummy-key"
         self.base_url = base_url or NVIDIA_BASE_URL
         self.model = model or NVIDIA_MODEL
         

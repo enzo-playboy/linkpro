@@ -1,23 +1,33 @@
 package com.jobautomator;
 
-import io.agentscope.core.agent.Agent;
+import com.jobautomator.exception.CentralizedErrorHandler;
+import com.jobautomator.ratelimit.ReactiveRateLimiter;
+import com.jobautomator.ratelimit.ServiceName;
+import com.jobautomator.security.SecureProcessExecutor;
+import io.agentscope.core.message.ContentBlock;
 import io.agentscope.core.message.Msg;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-
-import io.agentscope.extensions.model.openai.OpenAIChatModel;
 import io.agentscope.core.message.MsgRole;
 import io.agentscope.core.message.TextBlock;
+import io.agentscope.core.model.ChatResponse;
+import io.agentscope.extensions.model.openai.OpenAIChatModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Reactive Multi-Agent Orchestrator for JobAutomator AI using AgentScope Java.
- * Built with Project Reactor (non-blocking Mono/Flux pipelines).
+ * Built with Project Reactor (strictly non-blocking Mono/Flux pipelines).
+ * Features:
+ *  - Centralized Exception Handling & secret masking
+ *  - Token-bucket Reactive Rate Limiting across all external services
+ *  - Sanitized & non-blocking sub-process execution for BrowserGym
  */
 public class JobAutomatorOrchestrator {
     private static final Logger log = LoggerFactory.getLogger(JobAutomatorOrchestrator.class);
@@ -26,16 +36,30 @@ public class JobAutomatorOrchestrator {
     private final String supabaseUrl;
     private final String supabaseKey;
     private final OpenAIChatModel chatModel;
+    private final SecureProcessExecutor processExecutor;
+    private final ReactiveRateLimiter rateLimiter;
 
     public JobAutomatorOrchestrator() {
+        this(
+                null,
+                new SecureProcessExecutor(),
+                new ReactiveRateLimiter()
+        );
+    }
+
+    public JobAutomatorOrchestrator(OpenAIChatModel chatModel,
+                                     SecureProcessExecutor processExecutor,
+                                     ReactiveRateLimiter rateLimiter) {
         this.openaiApiKey = System.getenv().getOrDefault("OPENAI_API_KEY", "");
         this.supabaseUrl = System.getenv().getOrDefault("SUPABASE_URL", "");
         this.supabaseKey = System.getenv().getOrDefault("SUPABASE_KEY", "");
-        
-        this.chatModel = OpenAIChatModel.builder()
+
+        this.chatModel = (chatModel != null) ? chatModel : OpenAIChatModel.builder()
                 .apiKey(this.openaiApiKey.isEmpty() ? "dummy-key" : this.openaiApiKey)
                 .modelName("gpt-4o-mini")
                 .build();
+        this.processExecutor = Objects.requireNonNullElseGet(processExecutor, SecureProcessExecutor::new);
+        this.rateLimiter = Objects.requireNonNullElseGet(rateLimiter, ReactiveRateLimiter::new);
     }
 
     /**
@@ -46,6 +70,21 @@ public class JobAutomatorOrchestrator {
      * @return Mono emission of completion status summary
      */
     public Mono<Map<String, Object>> processJobApplicationsPipeline(List<String> targetKeywords, String targetLocation) {
+        if (targetKeywords == null || targetKeywords.isEmpty()) {
+            return Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                    new IllegalArgumentException("targetKeywords must not be null or empty"),
+                    "processJobApplicationsPipeline",
+                    Map.of("totalProcessed", 0)
+            ));
+        }
+        if (targetLocation == null || targetLocation.isBlank()) {
+            return Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                    new IllegalArgumentException("targetLocation must not be null or blank"),
+                    "processJobApplicationsPipeline",
+                    Map.of("totalProcessed", 0)
+            ));
+        }
+
         log.info("Starting reactive job application pipeline for keywords: {} in {}", targetKeywords, targetLocation);
 
         return Flux.fromIterable(targetKeywords)
@@ -60,114 +99,120 @@ public class JobAutomatorOrchestrator {
                         "results", results,
                         "status", "SUCCESS"
                 ))
-                .onErrorResume(e -> {
-                    log.error("Failed to execute job application pipeline", e);
-                    return Mono.just(Map.<String, Object>of(
-                            "status", "FAILED",
-                            "error", e.getMessage()
-                    ));
-                });
+                .onErrorResume(e -> Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                        e, "processJobApplicationsPipeline", Map.of("totalProcessed", 0)
+                )));
     }
 
-    private Flux<Map<String, Object>> searchJobsForKeyword(String keyword, String location) {
-        log.info("Scraping job listings for keyword: {}...", keyword);
-        // Reactive mock emission representing scraped LinkedIn postings
-        Map<String, Object> sampleJob = Map.of(
-                "jobId", "linkedin-102938",
-                "title", keyword + " Specialist",
-                "company", "Tech Global",
-                "applyUrl", "https://www.linkedin.com/jobs/search/?keywords=" + keyword,
-                "isEasyApply", true
-        );
-        return Flux.just(sampleJob);
+    protected Flux<Map<String, Object>> searchJobsForKeyword(String keyword, String location) {
+        return rateLimiter.acquire(ServiceName.LINKEDIN_SCRAPING)
+                .thenMany(Flux.defer(() -> {
+                    log.info("Scraping job listings for keyword: {} in location: {}", keyword, location);
+                    Map<String, Object> sampleJob = Map.of(
+                            "jobId", "linkedin-" + Math.abs(keyword.hashCode() % 1000000),
+                            "title", keyword + " Specialist",
+                            "company", "Tech Global",
+                            "applyUrl", "https://www.linkedin.com/jobs/search/?keywords=" + keyword,
+                            "isEasyApply", true
+                    );
+                    return Flux.just(sampleJob);
+                }));
     }
 
-    private Mono<Map<String, Object>> evaluateJobMatchScore(Map<String, Object> job) {
-        log.info("Evaluating AI match score for job: {}", job.get("title"));
-        
+    protected Mono<Map<String, Object>> evaluateJobMatchScore(Map<String, Object> job) {
         String prompt = "Evaluate the match score (0 to 100) for a job posting. Return ONLY a number.\n" +
                 "Job Title: " + job.get("title") + "\n" +
                 "Company: " + job.get("company") + "\n" +
                 "My profile: Java Developer with Reactive Programming experience.";
-                
+
         Msg userMsg = Msg.builder()
                 .role(MsgRole.USER)
                 .content(TextBlock.builder().text(prompt).build())
                 .name("user")
                 .build();
 
-        return chatModel.generate(List.of(userMsg), null, null)
-                .map(response -> {
-                    Map<String, Object> updated = new HashMap<>(job);
-                    try {
-                        double score = Double.parseDouble(response.getText().replaceAll("[^0-9.]", "").trim());
-                        updated.put("matchScore", score);
-                        log.info("AI returned match score: {} for job: {}", score, job.get("title"));
-                    } catch (Exception e) {
-                        log.warn("Failed to parse score: {}", response.getText());
-                        updated.put("matchScore", 50.0);
-                    }
-                    return updated;
-                })
+        return rateLimiter.acquire(ServiceName.OPENAI_API)
+                .then(chatModel.stream(List.of(userMsg), null, null)
+                        .reduce("", (acc, chunk) -> acc + extractText(chunk))
+                        .map(text -> {
+                            Map<String, Object> updated = new HashMap<>(job);
+                            try {
+                                double score = Double.parseDouble(text.replaceAll("[^0-9.]", "").trim());
+                                updated.put("matchScore", score);
+                                log.info("AI returned match score: {} for job: {}", score, job.get("title"));
+                            } catch (Exception e) {
+                                log.warn("Failed to parse score: {}", text);
+                                updated.put("matchScore", 50.0);
+                            }
+                            return updated;
+                        })
+                )
                 .onErrorResume(e -> {
-                    log.error("AI Evaluation failed", e);
                     Map<String, Object> updated = new HashMap<>(job);
                     updated.put("matchScore", 50.0);
-                    return Mono.just(updated);
+                    return Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                            e, "evaluateJobMatchScore", updated
+                    ));
                 });
     }
 
-    private Mono<Map<String, Object>> tailorResumeAndCoverLetter(Map<String, Object> job) {
-        log.info("Tailoring ATS resume and Cover Letter via AI for job: {}", job.get("title"));
-        
+    protected Mono<Map<String, Object>> tailorResumeAndCoverLetter(Map<String, Object> job) {
         String prompt = "Generate a short, tailored cover letter (2 paragraphs) for the following job in Portuguese.\n" +
                 "Job Title: " + job.get("title") + "\n" +
                 "Company: " + job.get("company");
-                
+
         Msg userMsg = Msg.builder()
                 .role(MsgRole.USER)
                 .content(TextBlock.builder().text(prompt).build())
                 .name("user")
                 .build();
 
-        return chatModel.generate(List.of(userMsg), null, null)
-                .map(response -> {
-                    Map<String, Object> updated = new HashMap<>(job);
-                    updated.put("tailoredResumeId", "res-" + System.currentTimeMillis());
-                    updated.put("coverLetterText", response.getText());
-                    log.info("AI Cover Letter generated successfully.");
-                    return updated;
-                })
+        return rateLimiter.acquire(ServiceName.OPENAI_API)
+                .then(chatModel.stream(List.of(userMsg), null, null)
+                        .reduce("", (acc, chunk) -> acc + extractText(chunk))
+                        .map(text -> {
+                            Map<String, Object> updated = new HashMap<>(job);
+                            updated.put("tailoredResumeId", "res-" + System.currentTimeMillis());
+                            updated.put("coverLetterText", text);
+                            log.info("AI Cover Letter generated successfully for: {}", job.get("title"));
+                            return updated;
+                        })
+                )
                 .onErrorResume(e -> {
-                    log.error("AI Cover Letter generation failed", e);
                     Map<String, Object> updated = new HashMap<>(job);
                     updated.put("tailoredResumeId", "res-" + System.currentTimeMillis());
                     updated.put("coverLetterText", "Prezados recrutadores, me candidato à vaga...");
-                    return Mono.just(updated);
+                    return Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                            e, "tailorResumeAndCoverLetter", updated
+                    ));
                 });
     }
 
-    private Mono<Map<String, Object>> triggerBrowserGymAutoApply(Map<String, Object> jobData) {
-        log.info("Triggering BrowserGym auto-apply sub-agent for job: {}", jobData.get("title"));
-        
-        return Mono.fromCallable(() -> {
-            // Invokes Python BrowserGym service via process execution or API
-            ProcessBuilder pb = new ProcessBuilder(
-                    ".venv/Scripts/python.exe", "src/browsergym_service.py"
-            );
-            Process process = pb.start();
-            int exitCode = process.waitFor();
-            
-            Map<String, Object> updated = new HashMap<>(jobData);
-            updated.put("applicationStatus", exitCode == 0 ? "SUBMITTED" : "REQUIRES_MANUAL");
-            return updated;
-        }).onErrorResume(e -> {
-            log.error("BrowserGym execution encountered an error", e);
-            Map<String, Object> updated = new HashMap<>(jobData);
-            updated.put("applicationStatus", "FAILED");
-            updated.put("error", e.getMessage());
-            return Mono.<Map<String, Object>>just(updated);
-        });
+    protected Mono<Map<String, Object>> triggerBrowserGymAutoApply(Map<String, Object> jobData) {
+        log.info("Triggering BrowserGym auto-apply sub-agent safely for job: {}", jobData.get("title"));
+
+        return rateLimiter.acquire(ServiceName.BROWSERGYM_APPLY)
+                .then(processExecutor.executePythonScript("src/browsergym_service.py", List.of()))
+                .map(result -> {
+                    Map<String, Object> updated = new HashMap<>(jobData);
+                    updated.put("applicationStatus", result.isSuccess() ? "SUBMITTED" : "REQUIRES_MANUAL");
+                    updated.put("exitCode", result.exitCode());
+                    return updated;
+                })
+                .onErrorResume(e -> {
+                    Map<String, Object> updated = new HashMap<>(jobData);
+                    updated.put("applicationStatus", "FAILED");
+                    return Mono.just(CentralizedErrorHandler.formatErrorResponse(
+                            e, "triggerBrowserGymAutoApply", updated
+                    ));
+                });
+    }
+
+    private String extractText(ChatResponse response) {
+        if (response.getContent() == null) return "";
+        return response.getContent().stream()
+                .filter(block -> block instanceof TextBlock)
+                .map(block -> ((TextBlock) block).getText())
+                .collect(Collectors.joining());
     }
 }
-

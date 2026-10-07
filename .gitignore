@@ -16,3 +16,9 @@ target/
 # Generated output files
 screenshots/
 generated_resumes/
+
+# Reference repositories (study only)
+ecc-reference/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
